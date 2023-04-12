@@ -162,14 +162,14 @@ apiVersion: v1
 kind: Service
 metadata:
   name: nginx
-  namespace: 
+  namespace: hello
 spec:
   selector:
-    app.kubernetes.io/name: MyApp
+    app: nginx
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 9376
+      port: 80 # service port
+      targetPort: 80 # pod port
 ```
 
 ## Ingress
