@@ -1,5 +1,36 @@
 # DevOps workshop part I
 
+## Docker container
+
+### Code
+
+```bash
+# build image
+
+docker build ./ -t nginx-image
+
+# run image
+
+docker run --name nginx -d -p 8080:80 nginx-image
+
+# run image and mount container
+
+docker run --name nginx -d -p 8080:80 --volume //c/Users/path/to/folder/with/index.html:/var/www/html nginx-image
+```
+
+### Dockerfile
+
+```dockerfile
+FROM ubuntu:20.04
+
+RUN apt update
+RUN apt -y install nginx
+
+COPY ./test.html /var/www/html/index.html
+
+CMD ["/bin/bash", "-c", "nginx -g \"daemon off;\""]
+```
+
 ## Nodes & Namespaces
 
 ### Code
