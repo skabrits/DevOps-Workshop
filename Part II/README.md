@@ -308,7 +308,7 @@ helm dependency build {chart name}
 
 # template locally
 
-helm template [NAME] [CHART]
+helm template {name for app in cluster} {chart name}
 
 # package chart
 
