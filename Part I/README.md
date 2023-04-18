@@ -149,6 +149,7 @@ kubectl create deployment nginx --image=nginx --replicas=3 -n {namespace}
 
 ### Sample manifest
 
+Deployment
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -170,6 +171,35 @@ spec:
       containers:
       - name: nginx
         image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+```
+
+ReplicaSet coresponding to deployment
+```yaml
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  labels:
+    app: nginx
+    pod-template-hash: 7fb96c846b
+  name: nginx-deployment-7fb96c846b
+  namespace: hello
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+      pod-template-hash: 7fb96c846b
+  template:
+    metadata:
+      labels:
+        app: nginx
+        pod-template-hash: 7fb96c846b
+    spec:
+      containers:
+      - image: nginx:1.14.2
+        name: nginx
         ports:
         - containerPort: 80
 ```
