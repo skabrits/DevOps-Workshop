@@ -113,6 +113,10 @@ kubectl describe po -n {namespace} {pod-name}
 # get logs
 
 kubectl logs -n {namespace} {pod-name}
+
+# proxy pod to localhost
+
+kubectl port-forward pod/{pod-name} -n {namespace} 80
 ```
 
 ### Sample manifest
@@ -154,7 +158,7 @@ Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx-deployment
+  name: web-server
   namespace: hello
   labels:
     app: nginx
@@ -170,7 +174,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: nginx:1.14.2
+        image: nginx
         ports:
         - containerPort: 80
 ```
@@ -198,10 +202,87 @@ spec:
         pod-template-hash: 7fb96c846b
     spec:
       containers:
-      - image: nginx:1.14.2
+      - image: nginx
         name: nginx
         ports:
         - containerPort: 80
+```
+
+Node affinity
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-node-affinity
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: topology.kubernetes.io/zone
+            operator: In
+            values:
+            - antarctica-east1
+            - antarctica-west1
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 1
+        preference:
+          matchExpressions:
+          - key: gpu-type
+            operator: In
+            values:
+            - nvidia
+      - weight: 5
+        preference:
+          matchExpressions:
+          - key: gpu-type
+            operator: In
+            values:
+            - tesla
+  containers:
+  - name: nginx-node-affinity
+    image: nginx
+```
+
+Pod affinity
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: storage
+spec:
+  selector:
+    matchLabels:
+      app: store
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: store
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - store
+            topologyKey: "kubernetes.io/hostname"
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - nginx
+            topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: storage
+        image: nginx
 ```
 
 ## Service
@@ -212,6 +293,10 @@ spec:
 # get service
 
 kubectl get svc -n {namespace}
+
+# proxy service to localhost
+
+kubectl port-forward service/{service-name} -n {namespace} 80
 
 # you know the rest...
 ```
