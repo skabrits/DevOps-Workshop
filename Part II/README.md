@@ -155,7 +155,7 @@ spec:
         readOnly: true
   volumes:
     - name: secret-volume
-      secret:
+      secretName:
         name: my-secret-html-file
         optional: true
 ```
